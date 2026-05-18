@@ -363,6 +363,19 @@ document.addEventListener("DOMContentLoaded", () => {
     return "academic";
   }
 
+  // Highlight and scroll to an activity card from a shared link
+  function highlightSharedActivity(activityName) {
+    const cards = activitiesList.querySelectorAll(".activity-card");
+    for (const card of cards) {
+      const title = card.querySelector("h4");
+      if (title && title.textContent.trim() === activityName) {
+        card.classList.add("activity-highlighted");
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        break;
+      }
+    }
+  }
+
   // Function to fetch activities from API with optional day and time filters
   async function fetchActivities() {
     // Show loading skeletons first
@@ -402,6 +415,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Apply search and filter, and handle weekend filter in client
       displayFilteredActivities();
+
+      // Highlight activity from shared link if present
+      const sharedActivity = new URLSearchParams(window.location.search).get("activity");
+      if (sharedActivity) {
+        highlightSharedActivity(sharedActivity);
+      }
     } catch (error) {
       activitiesList.innerHTML =
         "<p>Failed to load activities. Please try again later.</p>";
@@ -568,6 +587,11 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `
         }
+        <div class="share-buttons">
+          <button class="share-button share-email" data-activity="${name}" title="Share via Email">✉️</button>
+          <button class="share-button share-whatsapp" data-activity="${name}" title="Share via WhatsApp">💬</button>
+          <button class="share-button share-copy" data-activity="${name}" title="Copy link">🔗</button>
+        </div>
       </div>
     `;
 
@@ -586,6 +610,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Add click handlers for share buttons
+    activityCard.querySelector(".share-email").addEventListener("click", () => {
+      shareActivity(name, details, "email");
+    });
+    activityCard.querySelector(".share-whatsapp").addEventListener("click", () => {
+      shareActivity(name, details, "whatsapp");
+    });
+    activityCard.querySelector(".share-copy").addEventListener("click", (event) => {
+      shareActivity(name, details, "copy", event.currentTarget);
+    });
 
     activitiesList.appendChild(activityCard);
   }
@@ -797,6 +832,40 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     );
+  }
+
+  // Build a shareable URL for an activity
+  function getActivityShareUrl(activityName) {
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.searchParams.set("activity", activityName);
+    return url.toString();
+  }
+
+  // Share an activity via different channels
+  function shareActivity(name, details, channel, button) {
+    const shareUrl = getActivityShareUrl(name);
+    const description = details.description || "";
+    const shareText = `Check out "${name}" at Mergington High School!${description ? " " + description : ""} Schedule: ${formatSchedule(details)}`;
+
+    if (channel === "email") {
+      const subject = encodeURIComponent(`Join me: ${name} at Mergington High School`);
+      const body = encodeURIComponent(`${shareText}\n\nLearn more and sign up: ${shareUrl}`);
+      window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+    } else if (channel === "whatsapp") {
+      const message = encodeURIComponent(`${shareText} ${shareUrl}`);
+      window.open(`https://wa.me/?text=${message}`, "_blank");
+    } else if (channel === "copy") {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        const original = button.textContent;
+        button.textContent = "✅";
+        setTimeout(() => {
+          button.textContent = original;
+        }, 2000);
+      }).catch(() => {
+        showMessage(`Could not copy link automatically. Please copy this URL: ${shareUrl}`, "error");
+      });
+    }
   }
 
   // Show message function
