@@ -46,8 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Authentication state
   let currentUser = null;
-  let currentTheme =
-    document.documentElement.getAttribute("data-theme") || "light";
+  let currentTheme;
   const THEME_STORAGE_KEY = "preferredTheme";
 
   // Time range mappings for the dropdown
@@ -286,9 +285,11 @@ document.addEventListener("DOMContentLoaded", () => {
   loginButton.addEventListener("click", openLoginModal);
   logoutButton.addEventListener("click", logout);
   closeLoginModal.addEventListener("click", closeLoginModalHandler);
-  themeToggleButton.addEventListener("click", () => {
-    applyTheme(currentTheme === "dark" ? "light" : "dark");
-  });
+  if (themeToggleButton) {
+    themeToggleButton.addEventListener("click", () => {
+      applyTheme(currentTheme === "dark" ? "light" : "dark");
+    });
+  }
 
   // Close login modal when clicking outside
   window.addEventListener("click", (event) => {
