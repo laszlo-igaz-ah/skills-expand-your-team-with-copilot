@@ -46,7 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Authentication state
   let currentUser = null;
-  let currentTheme;
+  let currentTheme =
+    document.documentElement.getAttribute("data-theme") || "light";
   const THEME_STORAGE_KEY = "preferredTheme";
 
   // Time range mappings for the dropdown
@@ -71,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function applyTheme(theme, persist = true) {
+  function applyTheme(theme) {
     currentTheme = theme;
     document.documentElement.setAttribute("data-theme", theme);
 
@@ -90,9 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     }
 
-    if (persist) {
-      localStorage.setItem(THEME_STORAGE_KEY, theme);
-    }
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
   }
 
   function initializeTheme() {
@@ -108,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
       initialTheme = "dark";
     }
 
-    applyTheme(initialTheme, false);
+    applyTheme(initialTheme);
   }
 
   // Function to set day filter
