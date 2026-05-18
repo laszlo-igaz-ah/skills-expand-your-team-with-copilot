@@ -89,6 +89,10 @@ document.addEventListener("DOMContentLoaded", () => {
         "aria-pressed",
         theme === "dark" ? "true" : "false"
       );
+      themeToggleButton.setAttribute(
+        "aria-label",
+        theme === "dark" ? "Toggle light mode" : "Toggle dark mode"
+      );
     }
 
     localStorage.setItem(THEME_STORAGE_KEY, theme);
