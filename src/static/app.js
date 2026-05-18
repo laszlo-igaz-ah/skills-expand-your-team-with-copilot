@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Authentication state
   let currentUser = null;
-  let currentTheme = "light";
+  let currentTheme;
   const THEME_STORAGE_KEY = "preferredTheme";
 
   // Time range mappings for the dropdown
@@ -100,12 +100,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const systemPrefersDark = window.matchMedia(
       "(prefers-color-scheme: dark)"
     ).matches;
-    const initialTheme =
-      savedTheme === "dark" || savedTheme === "light"
-        ? savedTheme
-        : systemPrefersDark
-        ? "dark"
-        : "light";
+    let initialTheme = "light";
+
+    if (savedTheme === "dark" || savedTheme === "light") {
+      initialTheme = savedTheme;
+    } else if (systemPrefersDark) {
+      initialTheme = "dark";
+    }
 
     applyTheme(initialTheme, false);
   }

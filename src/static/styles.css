@@ -656,6 +656,7 @@ footer {
 }
 
 #theme-toggle {
+  display: flex;
   justify-content: center;
 }
 
